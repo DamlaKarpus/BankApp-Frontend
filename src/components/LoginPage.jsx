@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
 import './LoginPage.css';
 
-function LoginPage({ onSwitchToRegister }) {
+function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // input değişikliklerini state'e kaydet
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // form gönderilince çalışacak
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -20,16 +20,14 @@ function LoginPage({ onSwitchToRegister }) {
 
     try {
       const response = await axios.post('http://localhost:8080/api/auth/login', formData);
-      
-      // Token'ı localStorage'a kaydet
+
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userId', response.data.userId);
 
       alert('Giriş başarılı!');
-
-      // TODO: İstersen yönlendirme yapılabilir (örn. dashboard’a)
-      // navigate('/dashboard');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+      setError(err.response?.data || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
     } finally {
       setLoading(false);
     }
@@ -67,15 +65,9 @@ function LoginPage({ onSwitchToRegister }) {
 
         <div className="register-link" style={{ marginTop: '15px' }}>
           Hesabınız yok mu?{' '}
-          <a
-            href="#!"
-            onClick={(e) => {
-              e.preventDefault();
-              onSwitchToRegister();
-            }}
-          >
+          <Link to="/register">
             Kayıt Ol
-          </a>
+          </Link>
         </div>
       </div>
     </div>
